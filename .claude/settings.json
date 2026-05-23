@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-Command *)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"Caveman mode ACTIVE (full level). Drop articles, fragments OK, short synonyms. No filler/hedging/pleasantries. Technical terms exact. Off only: stop caveman / normal mode.\"}}'"
+          }
+        ]
+      }
+    ]
+  }
+}

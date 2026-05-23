@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "caveman": {
+      "source": "juliusbrussee/caveman",
+      "sourceType": "github",
+      "skillPath": "skills/caveman/SKILL.md",
+      "computedHash": "dfbf85749fd474feeb0bbe60c779795ecd5dbec0083299b56e68916bc3ddd8c9"
+    },
+    "lazy-nvim-optimization": {
+      "source": "kriscard/kriscard-claude-plugins",
+      "sourceType": "github",
+      "skillPath": "plugins/neovim-advisor/skills/lazy-nvim-optimization/SKILL.md",
+      "computedHash": "9b8c696a0f627e824dbdd3fec47c6c59eccbb4cceb622e35a6ad0792a5f00986"
+    },
+    "neovim": {
+      "source": "julianobarbosa/claude-code-skills",
+      "sourceType": "github",
+      "skillPath": "skills/neovim/SKILL.md",
+      "computedHash": "65c7637d1b84037629011e8a6950296eebd61c76ec916af90660699d8aab756e"
+    }
+  }
+}
