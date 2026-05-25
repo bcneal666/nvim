@@ -5,6 +5,7 @@
 vim.opt.conceallevel = 0 -- 顯示完整 markdown 語法符號（不隱藏 ** / # 等）
 vim.opt.wrap = true      -- 超出視窗寬度的程式碼自動換行顯示
 vim.opt.linebreak = true -- 換行點對齊單字邊界（不在單字中間斷行）
+vim.opt.fileformat = "unix"   -- 存檔強制用 LF，避免 Codeium 生成碼混入 ^M
 
 -- Windows：優先使用 WinLibs(gcc)，clang 作為備援
 -- LazyVim 的 treesitter 健康檢查只認 gcc / cl，不認 clang

@@ -1,4 +1,15 @@
--- 停用 blink.cmp，改用 Codeium ghost text 作為唯一補全方式
+-- blink.cmp：LSP / Tailwind 補全
+-- Tab 拔掉還給 Codeium ghost text；Enter 接受 LSP 建議
 return {
-  { "saghen/blink.cmp", enabled = false },
+  {
+    "saghen/blink.cmp",
+    opts = {
+      keymap = {
+        preset = "default",
+        ["<Tab>"] = {},              -- Tab 還給 Codeium
+        ["<S-Tab>"] = {},            -- S-Tab 一起拔
+        ["<CR>"] = { "accept", "fallback" },
+      },
+    },
+  },
 }

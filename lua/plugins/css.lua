@@ -12,21 +12,34 @@ return {
     end,
   },
 
-  -- 2. Mason：自動安裝 CSS Language Server
+  -- 2. Mason：自動安裝 CSS Language Server + Tailwind Language Server
   {
     "mason-org/mason.nvim",
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
-      vim.list_extend(opts.ensure_installed, { "css-lsp" })
+      vim.list_extend(opts.ensure_installed, { "css-lsp", "tailwindcss-language-server" })
     end,
   },
 
-  -- 3. LSP：啟用 cssls（提供 IntelliSense、錯誤診斷、內建顏色提示）
+  -- 3. LSP：啟用 cssls + tailwindcss
   --    unknownAtRules = "ignore"：消除 Tailwind v4 新語法（@plugin、@custom-variant、@theme）的誤報警告
+  --    tailwindcss configFile：v4 設定在 CSS 檔，需手動指定
   {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
+        tailwindcss = {
+          settings = {
+            tailwindCSS = {
+              experimental = {
+                -- Tailwind v4：object 格式，明確指定 config → 適用檔案 glob
+                configFile = {
+                  ["app/globals.css"] = { "**/*.{ts,tsx,js,jsx,html,css}" },
+                },
+              },
+            },
+          },
+        },
         cssls = {
           settings = {
             css = {
