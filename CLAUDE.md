@@ -59,12 +59,17 @@ lua/
 
 ### 補全策略
 
-`blink.cmp` 已停用。補全全由 **Codeium ghost text** 提供。
+**blink.cmp**（LSP 補全 popup） + **Codeium ghost text**（行內建議）並存：
 
-- `<Tab>` — 接受整個建議
-- `<M-w>` — 接受一個單詞
-- `<M-]>` / `<M-[>` — 下一個 / 上一個建議
-- `<C-]>` — 取消建議
+- `<Tab>` — Codeium：接受整個 ghost text 建議
+- `<M-w>` — Codeium：接受一個單詞
+- `<M-]>` / `<M-[>` — Codeium：下一個 / 上一個建議
+- `<C-]>` — Codeium：取消建議
+- `<CR>` — blink：已選則接受、沒選 fallback 換行
+- `<C-Space>` — blink：手動觸發補全
+- 輸入關鍵字時 blink popup 自動彈出（LSP 候選 / Tailwind class）
+
+兩者視覺通常不衝突：blink popup 浮在游標下方、Codeium ghost text 嵌在游標後方。
 
 ### Windows 相容性
 
