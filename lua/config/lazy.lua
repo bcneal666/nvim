@@ -15,6 +15,10 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+  concurrency = 2, -- VPS 2 核，限制並發避免網路/記憶體爭搶
+  git = {
+    timeout = 240, -- 預設 120s，VPS 網速慢時易誤判卡死
+  },
   spec = {
     -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
