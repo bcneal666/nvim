@@ -3,7 +3,7 @@
 ## 概覽
 
 基於 **LazyVim** starter template 的 Neovim 配置。Lazy.nvim 管理 ~44 個插件。
-主要特色：**Codeium ghost text** 取代傳統補全選單、**Cyberdream** 配色、Web 開發完整 LSP。
+主要特色：**blink.cmp popup + Codeium ghost text** 雙補全並存、**Cyberdream** 配色、Web 開發完整 LSP。
 
 ## 常用指令
 
@@ -18,7 +18,7 @@
 | `:ConformInfo` | 查看目前 buffer 的 formatter |
 
 Lua 格式化（直接執行）：`stylua lua/`（`stylua.toml`：2 空格縮排、120 字元寬度）
-注意：Mason 也裝了 `stylua` 供 conform.nvim 在存檔時自動格式化，兩者共存。
+Mason 亦裝 `stylua` 供 conform.nvim 存檔時自動格式化，兩者共存。
 
 ## 目錄結構
 
@@ -38,8 +38,10 @@ lua/
   plugins/
     colorschema.lua   # Cyberdream 主題（lazy:false, priority:1000）
     codeium.lua       # Codeium ghost text（含 Windows workaround）
-    blink.lua         # 停用 blink.cmp
+    blink.lua         # blink.cmp 鍵位與 popup 行為（與 Codeium 並存）
     css.lua           # CSS/SCSS：Treesitter + cssls + highlight-colors
+    lint.lua          # markdownlint-cli2 工作目錄設定
+    markdown.lua      # 停用 render-markdown
     example.lua       # 範例 spec（已停用）
 ```
 
