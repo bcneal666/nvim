@@ -7,6 +7,10 @@ vim.opt.wrap = true -- 超出視窗寬度的程式碼自動換行顯示
 vim.opt.linebreak = true -- 換行點對齊單字邊界（不在單字中間斷行）
 vim.opt.fileformat = "unix" -- 存檔強制用 LF，避免 Codeium 生成碼混入 ^M
 
+-- 限制 ShaDa：原本累積到 335KB，啟動讀取 ~23ms、編輯期週期性寫入會微停頓。
+-- 100 檔歷史、每暫存器 50 行、單項上限 10KB、不存 hlsearch。
+vim.opt.shada = "'100,<50,s10,h"
+
 -- Windows：優先使用 WinLibs(gcc)，clang 作為備援
 -- LazyVim 的 treesitter 健康檢查只認 gcc / cl，不認 clang
 if vim.fn.has("win32") == 1 then

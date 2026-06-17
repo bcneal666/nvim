@@ -14,10 +14,15 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- 並發數依 CPU 核數自動調整：
+--   少核（VPS 2 核）壓到 2，避免 git/網路/記憶體爭搶。
+--   多核（Windows 工作站）設 nil，交還 lazy.nvim 預設（Windows 下為 nproc*2）→ install/update/sync 全速。
+local nproc = (vim.uv or vim.loop).available_parallelism and (vim.uv or vim.loop).available_parallelism() or 8
+
 require("lazy").setup({
-  concurrency = 2, -- VPS 2 核，限制並發避免網路/記憶體爭搶
+  concurrency = nproc <= 4 and 2 or nil,
   git = {
-    timeout = 240, -- 預設 120s，VPS 網速慢時易誤判卡死
+    timeout = 240, -- 預設 120s，VPS 網速慢時易誤判卡死（此為上限非延遲，多核快網機無害）
   },
   spec = {
     -- add LazyVim and import its plugins
@@ -36,9 +41,11 @@ require("lazy").setup({
   },
   install = { colorscheme = { "tokyonight", "habamax" } },
   checker = {
-    enabled = true, -- check for plugin updates periodically
-    notify = false, -- notify on update
-  }, -- automatically check for plugin updates
+    -- 關閉週期性背景更新檢查：每次檢查會對 44 個插件 git fetch（VPS 慢網吃力、
+    -- 且 Defender 會掃這些 git I/O）。改用手動 :Lazy update，行為更可預期。
+    enabled = false,
+    notify = false,
+  },
   performance = {
     rtp = {
       -- disable some rtp plugins

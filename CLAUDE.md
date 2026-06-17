@@ -17,8 +17,7 @@
 | `:checkhealth` | 診斷環境 |
 | `:ConformInfo` | 查看目前 buffer 的 formatter |
 
-Lua 格式化（直接執行）：`stylua lua/`（`stylua.toml`：2 空格縮排、120 字元寬度）
-Mason 亦裝 `stylua` 供 conform.nvim 存檔時自動格式化，兩者共存。
+Lua 格式化：手動 `stylua lua/`，或存檔時由 conform.nvim 自動套用（Mason 裝的 `stylua`，與系統版共存）。設定見 `stylua.toml`（2 空格縮排、120 字元寬度）。
 
 ## 目錄結構
 
@@ -31,10 +30,10 @@ stylua.toml           # Lua formatter 設定
 
 lua/
   config/
-    lazy.lua          # Lazy.nvim bootstrap + 全域設定
-    options.lua       # vim.opt 覆寫（wrap、Windows 編譯器偵測）
+    lazy.lua          # bootstrap + 全域設定（並發依核數、checker 關）
+    options.lua       # vim.opt 覆寫（wrap、shada 上限、Windows 編譯器偵測、Linux OOM）
     keymaps.lua       # 自訂快捷鍵（目前空白）
-    autocmds.lua      # 自訂 autocmd（lazyvim_wrap_spell 已停用）
+    autocmds.lua      # 自訂 autocmd（停用 wrap_spell、關 vtsls semantic tokens）
   plugins/
     colorschema.lua   # Cyberdream 主題（lazy:false, priority:1000）
     codeium.lua       # Codeium ghost text（含 Windows workaround）
@@ -42,7 +41,7 @@ lua/
     css.lua           # CSS/SCSS：Treesitter + cssls + highlight-colors
     lint.lua          # markdownlint-cli2 工作目錄設定
     markdown.lua      # 停用 render-markdown
-    example.lua       # 範例 spec（已停用）
+    typescript.lua    # vtsls 設定（maxTsServerMemory 依機器）
 ```
 
 ## 核心架構
@@ -114,7 +113,7 @@ ln -sf $(which fdfind) ~/.local/bin/fd
 
 ### Mason 自動裝（進 nvim 後無需手動）
 
-- **LSP**：tsserver、pyright、cssls、tailwindcss-language-server、yaml-language-server、taplo、jsonls、solidity-ls、codeium-language-server
+- **LSP**：vtsls、pyright、cssls、tailwindcss-language-server、yaml-language-server、taplo、jsonls、solidity-ls、codeium-language-server
 - **Formatter**：prettier、black、stylua
 - **Linter**：ruff、yamllint
 - **DAP**：debugpy
