@@ -2,6 +2,10 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 
+-- 停用 sql ftplugin 內建 omni 補全鍵位：其映射呼叫 sqlcomplete#DrillIntoTable /
+-- DrillOutOfColumns，在游標移動時觸發卻報 E117 Unknown function（LazyVim #6979）
+vim.g.omni_sql_no_default_maps = 1
+
 vim.opt.conceallevel = 0 -- 顯示完整 markdown 語法符號（不隱藏 ** / # 等）
 vim.opt.wrap = true -- 超出視窗寬度的程式碼自動換行顯示
 vim.opt.linebreak = true -- 換行點對齊單字邊界（不在單字中間斷行）
