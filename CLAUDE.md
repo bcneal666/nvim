@@ -21,11 +21,53 @@ Lua 格式化：手動 `stylua lua/`，或存檔時由 conform.nvim 自動套用
 
 ## 跨機器同步
 
-此 repo 會在多台機器（Windows + Linux VPS）間 `git push` / `git pull` 同步。
+此 repo 會在多台機器（Windows + Linux VPS）間 `git push` / `git pull` 同步。哪些設定隨 repo 走、哪些要每台機器自己設，先分清楚：
 
-- **`lazy-lock.json` 是自動寫入檔**：`:Lazy update` 會直接改寫它。裝完插件後應盡快 commit，避免本地未提交修改與遠端變更同一檔時卡住 `git pull`。
-- **pull 已設定自動暫存**：全域 `merge.autoStash` / `rebase.autoStash` 為 `true`，pull 前若工作區有未提交變更會自動 stash、合併後再還原，遇到真正衝突才需手動處理，不應再需要 `git reset --hard`。
-- **換行統一為 LF**：`.gitattributes` 對全部追蹤檔設 `eol=lf`，避免 Windows（`core.autocrlf=true`）與 Linux 之間出現整檔換行的假 diff。新機器 clone 後不用額外設定；若既有 checkout 在加入 `.gitattributes` 後仍顯示 CRLF，跑一次 `git rm --cached -r . && git reset --hard` 依新規則重新 checkout。
+| 項目 | 是否隨 repo 走 | 說明 |
+| --- | --- | --- |
+| `.gitattributes`（換行鎖 LF） | ✅ 在版控內 | clone 即生效，不需重設 |
+| `merge.autoStash` / `rebase.autoStash` | ❌ 不在版控內 | 存於 `~/.gitconfig`，**每台機器要手動設一次** |
+
+- **`lazy-lock.json` 是自動寫入檔**：`:Lazy update` 會直接改寫它。裝完插件後應盡快 commit + push。若兩台機器各自 commit 了同一行的不同版本，就是真正的 merge conflict，autoStash 救不了，只能手動挑版本（通常取時間較新的那次更新）。
+- **換行統一為 LF**：`.gitattributes` 對全部追蹤檔設 `eol=lf`，避免 Windows（系統層 `core.autocrlf=true`）與 Linux 之間出現整檔換行的假 diff。不必也不要去改 `core.autocrlf`，`.gitattributes` 的 `eol` 優先權高於它。
+
+### 每台新機器的一次性設定（必做）
+
+git config 不在版控內，clone 完要自己設：
+
+```bash
+# 1. 先確認 git 版本 ≥ 2.27（merge.autoStash 的最低要求）
+git --version
+
+# 2. pull 時自動暫存未提交變更，不必再 git reset --hard
+git config --global merge.autoStash true
+git config --global rebase.autoStash true
+
+# 3. 驗證：兩行都應印出 true
+git config --global --get merge.autoStash
+git config --global --get rebase.autoStash
+```
+
+寫入位置：Linux 為 `~/.gitconfig`，Windows 為 `C:/Users/<使用者>/.gitconfig`。
+只想影響此 repo 就把 `--global` 換成 `--local`（需在 repo 目錄內執行）。
+
+若 git < 2.27（舊版 Debian/Ubuntu 可能遇到），`merge.autoStash` 無效，改用 rebase 模式達到等效行為：
+
+```bash
+git config --global pull.rebase true    # 搭配 rebase.autoStash（1.8.4+ 即支援）
+```
+
+### 既有 checkout 的換行刷新（每台機器僅一次）
+
+`.gitattributes` 加入後，舊工作區已 checkout 的 CRLF 檔不會自動轉換：
+
+```bash
+git status                              # 必須先確認乾淨，下一行會丟棄未提交變更
+git rm --cached -r . && git reset --hard
+git ls-files --eol                      # 每列應為 i/lf w/lf attr/text=auto eol=lf
+```
+
+Linux 本來就是 LF，這步主要影響 Windows 機器；新 clone 的機器不需要跑。
 
 ## 目錄結構
 
