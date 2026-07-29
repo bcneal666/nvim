@@ -21,15 +21,15 @@ Lua 格式化：手動 `stylua lua/`，或存檔時由 conform.nvim 自動套用
 
 ## 跨機器同步
 
-此 repo 會在多台機器（Windows + Linux VPS）間 `git push` / `git pull` 同步。哪些設定隨 repo 走、哪些要每台機器自己設，先分清楚：
+此 repo 在多台機器（Windows + Linux VPS）間 `git push` / `git pull` 同步。哪些設定隨 repo 走、哪些要每台機器自己設，先分清楚：
 
 | 項目 | 是否隨 repo 走 | 說明 |
 | --- | --- | --- |
 | `.gitattributes`（換行鎖 LF） | ✅ 在版控內 | clone 即生效，不需重設 |
 | `merge.autoStash` / `rebase.autoStash` | ❌ 不在版控內 | 存於 `~/.gitconfig`，**每台機器要手動設一次** |
 
-- **`lazy-lock.json` 是自動寫入檔**：`:Lazy update` 會直接改寫它。裝完插件後應盡快 commit + push。若兩台機器各自 commit 了同一行的不同版本，就是真正的 merge conflict，autoStash 救不了，只能手動挑版本（通常取時間較新的那次更新）。
-- **換行統一為 LF**：`.gitattributes` 對全部追蹤檔設 `eol=lf`，避免 Windows（系統層 `core.autocrlf=true`）與 Linux 之間出現整檔換行的假 diff。不必也不要去改 `core.autocrlf`，`.gitattributes` 的 `eol` 優先權高於它。
+- **`lazy-lock.json` 是自動寫入檔**：`:Lazy update` 會直接改寫它。裝完插件後盡快 commit + push。若兩台機器各自 commit 了同一行的不同版本，就是真正的 merge conflict，autoStash 救不了，只能手動挑版本（通常取時間較新的那次更新）。
+- **換行統一為 LF**：`.gitattributes` 對全部追蹤檔設 `eol=lf`，避免 Windows（系統層 `core.autocrlf=true`）與 Linux 之間出現整檔換行的假 diff。不要改 `core.autocrlf`，`.gitattributes` 的 `eol` 優先權高於它。
 
 ### 每台新機器的一次性設定（必做）
 
