@@ -19,6 +19,14 @@
 
 Lua 格式化：手動 `stylua lua/`，或存檔時由 conform.nvim 自動套用（Mason 裝的 `stylua`，與系統版共存）。設定見 `stylua.toml`（2 空格縮排、120 字元寬度）。
 
+## 跨機器同步
+
+此 repo 會在多台機器（Windows + Linux VPS）間 `git push` / `git pull` 同步。
+
+- **`lazy-lock.json` 是自動寫入檔**：`:Lazy update` 會直接改寫它。裝完插件後應盡快 commit，避免本地未提交修改與遠端變更同一檔時卡住 `git pull`。
+- **pull 已設定自動暫存**：全域 `merge.autoStash` / `rebase.autoStash` 為 `true`，pull 前若工作區有未提交變更會自動 stash、合併後再還原，遇到真正衝突才需手動處理，不應再需要 `git reset --hard`。
+- **換行統一為 LF**：`.gitattributes` 對全部追蹤檔設 `eol=lf`，避免 Windows（`core.autocrlf=true`）與 Linux 之間出現整檔換行的假 diff。新機器 clone 後不用額外設定；若既有 checkout 在加入 `.gitattributes` 後仍顯示 CRLF，跑一次 `git rm --cached -r . && git reset --hard` 依新規則重新 checkout。
+
 ## 目錄結構
 
 ```text
