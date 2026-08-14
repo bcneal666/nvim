@@ -2,8 +2,7 @@
 
 ## 概覽
 
-基於 **LazyVim** starter template 的 Neovim 配置。Lazy.nvim 管理 ~44 個插件。
-特色：**blink.cmp popup + Codeium ghost text** 雙補全並存、**Cyberdream** 配色、Web 開發完整 LSP。
+基於 **LazyVim** starter template 的 Neovim 配置（Lazy.nvim 管理 ~44 個插件）。特色：**blink.cmp popup + Codeium ghost text** 雙補全並存、**Cyberdream** 配色、Web 開發完整 LSP。
 
 ## 常用指令
 
@@ -29,7 +28,7 @@ JS/TS/CSS/JSON/Markdown 由 prettier 處理（`formatting.prettier` extra），�
 | `.gitattributes`（換行鎖 LF） | ✅ 在版控內 | clone 即生效，不需重設 |
 | `merge.autoStash` / `rebase.autoStash` | ❌ 不在版控內 | 存於 `~/.gitconfig`，**每台機器要手動設一次** |
 
-- **`lazy-lock.json` 是自動寫入檔**：`:Lazy update` 會直接改寫它。裝完插件後盡快 commit + push。若兩台機器各自 commit 了同一行的不同版本，就是真正的 merge conflict，autoStash 救不了，只能手動挑版本（通常取時間較新的那次更新）。
+- **`lazy-lock.json` 是自動寫入檔**：`:Lazy update` 直接改寫它。裝完插件後盡快 commit + push。若兩台機器各自 commit 了同一行的不同版本，就是真正的 merge conflict，autoStash 救不了，只能手動挑版本（通常取時間較新的那次更新）。
 - **換行統一為 LF**：`.gitattributes` 對全部追蹤檔設 `eol=lf`，避免 Windows（系統層 `core.autocrlf=true`）與 Linux 之間出現整檔換行的假 diff。不要改 `core.autocrlf`，`.gitattributes` 的 `eol` 優先權高於它。
 
 ### 每台新機器的一次性設定（必做）
@@ -93,6 +92,8 @@ lua/
     lint.lua          # markdownlint-cli2 工作目錄設定
     markdown.lua      # 停用 render-markdown
     typescript.lua    # vtsls 設定（maxTsServerMemory 依機器）
+    snacks.lua        # snacks explorer 過濾（顯示隱藏檔、強制顯示 .env）
+    fzf.lua           # fzf-lua grep 掃隱藏檔
 ```
 
 ## 核心架構
@@ -109,6 +110,10 @@ lua/
 - **Formatting**：`formatting.prettier`
 
 新增語言支援優先用 `:LazyExtras`，不要手動設定 LSP。
+
+### 檔案總管
+
+`<leader>e` 開 **snacks.explorer**（LazyVim v8 起預設，非 neo-tree；本 repo 未裝）。過濾規則於 `lua/plugins/snacks.lua`：優先權 `include` glob > `hidden` > `ignored`；目前點檔全開、gitignore 命中仍隱藏、`.env*` 用 `include` 強制顯示。側欄按 `H` / `I` 可臨時切換 hidden / ignored。
 
 ### 補全策略
 
