@@ -32,3 +32,7 @@ end
 if vim.fn.has("linux") == 1 then
   pcall(vim.fn.writefile, { "500" }, "/proc/" .. vim.fn.getpid() .. "/oom_score_adj")
 end
+
+-- prettier 只在專案有設定檔（.prettierrc / package.json 的 prettier 欄位等）時才格式化，
+-- 避免對沒用 prettier 的專案套用預設風格。跨機器（Windows / Linux VPS）通用，無需平台分支。
+vim.g.lazyvim_prettier_needs_config = true

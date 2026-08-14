@@ -3,7 +3,7 @@
 ## 概覽
 
 基於 **LazyVim** starter template 的 Neovim 配置。Lazy.nvim 管理 ~44 個插件。
-主要特色：**blink.cmp popup + Codeium ghost text** 雙補全並存、**Cyberdream** 配色、Web 開發完整 LSP。
+特色：**blink.cmp popup + Codeium ghost text** 雙補全並存、**Cyberdream** 配色、Web 開發完整 LSP。
 
 ## 常用指令
 
@@ -18,6 +18,7 @@
 | `:ConformInfo` | 查看目前 buffer 的 formatter |
 
 Lua 格式化：手動 `stylua lua/`，或存檔時由 conform.nvim 自動套用（Mason 裝的 `stylua`，與系統版共存）。設定見 `stylua.toml`（2 空格縮排、120 字元寬度）。
+JS/TS/CSS/JSON/Markdown 由 prettier 處理（`formatting.prettier` extra），但只在專案有 prettier 設定檔（`.prettierrc` 等）時才格式化（`vim.g.lazyvim_prettier_needs_config = true`，見 `options.lua`），避免污染沒用 prettier 的專案。
 
 ## 跨機器同步
 
@@ -104,7 +105,8 @@ lua/
 
 - **AI**：`ai.claudecode`、`ai.codeium`
 - **Editor**：`editor.fzf`（fzf-lua，取代 Telescope）
-- **語言**：`lang.typescript`、`lang.python`、`lang.tailwind`、`lang.json`、`lang.yaml`、`lang.markdown`、`lang.sql`、`lang.toml`、`lang.git`、`lang.solidity`
+- **語言**：`lang.typescript`、`lang.tailwind`、`lang.json`、`lang.yaml`、`lang.markdown`、`lang.sql`、`lang.toml`、`lang.git`、`lang.solidity`
+- **Formatting**：`formatting.prettier`
 
 新增語言支援優先用 `:LazyExtras`，不要手動設定 LSP。
 
@@ -152,8 +154,8 @@ Clone 後先裝系統層工具（Mason 不處理這層）。
 | `fzf` | `fzf` | editor.fzf（fzf-lua） |
 | `ripgrep` | `ripgrep` | fzf 搜尋、grug-far |
 | `fd` | `fd-find` | fzf 檔案搜尋 |
-| `node` + `npm` | `nodejs npm` | TS/Tailwind/Solidity LSP、markdown-preview |
-| `python3` + `pip` | `python3 python3-pip` | pyright、black、ruff、debugpy、yamllint |
+| `node` + `npm` | `nodejs npm` | TS/Tailwind/Solidity LSP、markdown-preview、prettier |
+| `python3` + `pip` | `python3 python3-pip` | 僅在啟用 `lang.python` extra 時需要（目前未啟用） |
 
 ```bash
 sudo apt install git gcc fzf ripgrep fd-find nodejs npm python3 python3-pip
@@ -163,10 +165,9 @@ ln -sf $(which fdfind) ~/.local/bin/fd
 
 ### Mason 自動裝（進 nvim 後無需手動）
 
-- **LSP**：vtsls、pyright、cssls、tailwindcss-language-server、yaml-language-server、taplo、jsonls、solidity-ls、codeium-language-server
-- **Formatter**：prettier、black、stylua
-- **Linter**：ruff、yamllint
-- **DAP**：debugpy
+- **LSP**：lua_ls、vtsls、cssls、tailwindcss-language-server、yaml-language-server、taplo、jsonls、solidity-ls、marksman
+- **Formatter**：prettier、stylua、shfmt、markdown-toc
+- **Linter**：markdownlint-cli2、sqlfluff
 
 ### 選裝
 
