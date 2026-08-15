@@ -36,7 +36,7 @@ JS/TS/CSS/JSON/Markdown 由 prettier 處理（`formatting.prettier` extra），�
 `options.lua` 依 `SSH_TTY` / `SSH_CONNECTION` 判斷是否在 SSH session 內，只在遠端（如 VPS）才設 `vim.g.clipboard` 走 OSC 52；本機執行時此段不觸發，沿用 nvim 內建偵測（Wayland/X11 → `wl-copy` / `xclip`）。
 
 - **paste 只讀 nvim 自身 register**，不用 OSC 52 query：`vim.ui.clipboard.osc52` 的 paste 需等終端機回應，逾時最長 10 秒，且多數終端機的剪貼簿讀取需逐次授權，代價太高
-- **yank 同步沿用 LazyVim 預設**：SSH 時 `clipboard` 留空，複製到本機需明打 `"+y`，避免每次 yank 都送出 base64 跳脫序列
+- **yank 自動鏡射到 `+`**：`clipboard` 仍留空（不設 `unnamedplus`），改由 `TextYankPost` autocmd 只在 yank（非 `d`/`x`/`c`）且未指定 register 時把內容寫進 `+`，觸發 OSC 52；`v` 選取後直接 `y` 即可回本機，`"ay` 這類指定 register 的 yank 不鏡射
 - **VPS 若跑 tmux**：需在 `~/.tmux.conf` 加 `set -g set-clipboard on`（tmux 2.6+，不進版控，各機自行設），否則 OSC 52 序列被 tmux 攔截轉不到終端機
 
 ### 每台新機器的一次性設定（必做）

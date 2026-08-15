@@ -52,4 +52,17 @@ if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
     copy = { ["+"] = osc52.copy("+"), ["*"] = osc52.copy("*") },
     paste = { ["+"] = paste, ["*"] = paste },
   }
+
+  -- clipboard 選項在 SSH 下被 LazyVim 設為空字串（其 options.lua），故 y 只寫 unnamed
+  -- register，不會觸發上面的 OSC 52 copy。這裡只把「yank」鏡射到 +，
+  -- 讓 v→y 直接回本機；d / x / c 仍不送出，避免刪除污染本機剪貼簿與多餘的 base64 流量。
+  vim.api.nvim_create_autocmd("TextYankPost", {
+    group = vim.api.nvim_create_augroup("user_osc52_yank", { clear = true }),
+    callback = function()
+      local ev = vim.v.event
+      if ev.operator == "y" and ev.regname == "" then
+        vim.fn.setreg("+", ev.regcontents, ev.regtype)
+      end
+    end,
+  })
 end
