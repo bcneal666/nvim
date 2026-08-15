@@ -31,6 +31,14 @@ JS/TS/CSS/JSON/Markdown 由 prettier 處理（`formatting.prettier` extra），�
 - **`lazy-lock.json` 是自動寫入檔**：`:Lazy update` 直接改寫它。裝完插件後盡快 commit + push。若兩台機器各自 commit 了同一行的不同版本，就是真正的 merge conflict，autoStash 救不了，只能手動挑版本（通常取時間較新的那次更新）。
 - **換行統一為 LF**：`.gitattributes` 對全部追蹤檔設 `eol=lf`，避免 Windows（系統層 `core.autocrlf=true`）與 Linux 之間出現整檔換行的假 diff。不要改 `core.autocrlf`，`.gitattributes` 的 `eol` 優先權高於它。
 
+### 剪貼簿（本機 vs SSH）
+
+`options.lua` 依 `SSH_TTY` / `SSH_CONNECTION` 判斷是否在 SSH session 內，只在遠端（如 VPS）才設 `vim.g.clipboard` 走 OSC 52；本機執行時此段不觸發，沿用 nvim 內建偵測（Wayland/X11 → `wl-copy` / `xclip`）。
+
+- **paste 只讀 nvim 自身 register**，不用 OSC 52 query：`vim.ui.clipboard.osc52` 的 paste 需等終端機回應，逾時最長 10 秒，且多數終端機的剪貼簿讀取需逐次授權，代價太高
+- **yank 同步沿用 LazyVim 預設**：SSH 時 `clipboard` 留空，複製到本機需明打 `"+y`，避免每次 yank 都送出 base64 跳脫序列
+- **VPS 若跑 tmux**：需在 `~/.tmux.conf` 加 `set -g set-clipboard on`（tmux 2.6+，不進版控，各機自行設），否則 OSC 52 序列被 tmux 攔截轉不到終端機
+
 ### 每台新機器的一次性設定（必做）
 
 git config 不在版控內，clone 完要自己設：

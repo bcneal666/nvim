@@ -36,3 +36,20 @@ end
 -- prettier 只在專案有設定檔（.prettierrc / package.json 的 prettier 欄位等）時才格式化，
 -- 避免對沒用 prettier 的專案套用預設風格。跨機器（Windows / Linux VPS）通用，無需平台分支。
 vim.g.lazyvim_prettier_needs_config = true
+
+-- SSH session 走 OSC 52：nvim 送跳脫序列給終端機，由終端機寫入「本機」剪貼簿，
+-- VPS 沒有 X11/Wayland 也能把 "+y 的內容帶回本機。
+-- 本機執行時此段不觸發，沿用 nvim 內建偵測（Wayland/X11 → wl-copy / xclip）。
+-- paste 刻意讀 nvim 自身 register：vim.ui.clipboard.osc52 的 paste 會阻塞等終端機
+-- 回應最長 10 秒，且多數終端機的剪貼簿讀取需逐次授權。
+if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
+  local osc52 = require("vim.ui.clipboard.osc52")
+  local function paste()
+    return { vim.fn.split(vim.fn.getreg(""), "\n"), vim.fn.getregtype("") }
+  end
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = { ["+"] = osc52.copy("+"), ["*"] = osc52.copy("*") },
+    paste = { ["+"] = paste, ["*"] = paste },
+  }
+end
