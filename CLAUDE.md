@@ -84,13 +84,16 @@ init.lua              # 入口點：require("config.lazy")
 lazyvim.json          # LazyVim extras 清單
 lazy-lock.json        # 插件版本鎖定
 stylua.toml           # Lua formatter 設定
-.markdownlint.json    # markdownlint 設定（MD013/MD060 已關）
+.markdownlint.json    # markdownlint 設定（MD013/MD040/MD060 已關）
+.gitattributes        # 換行鎖 LF（eol=lf）
+.gitignore            # 忽略暫存/除錯檔案
+.neoconf.json         # neoconf/neodev：讓 lua_ls 認得 nvim API
 
 lua/
   config/
     lazy.lua          # bootstrap + 全域設定（並發依核數、checker 關）
     options.lua       # vim.opt 覆寫（wrap、shada 上限、Windows 編譯器偵測、Linux OOM）
-    keymaps.lua       # 自訂快捷鍵（目前空白）
+    keymaps.lua       # 自訂快捷鍵（jj → <Esc>，離開 insert 模式）
     autocmds.lua      # 自訂 autocmd（停用 wrap_spell、關 vtsls semantic tokens）
   plugins/
     colorschema.lua   # Cyberdream 主題（lazy:false, priority:1000）
