@@ -1,18 +1,17 @@
 # 💤 LazyVim 個人設定
 
-基於 [LazyVim](https://github.com/LazyVim/LazyVim) 的 Neovim 設定：blink.cmp popup +
-Codeium ghost text 雙補全並存、Cyberdream 配色、Web 開發完整 LSP。跨 Windows 工作站與
-Linux VPS 同步使用（`git push` / `git pull`）。
+基於 [LazyVim](https://github.com/LazyVim/LazyVim) 的 Neovim 設定：blink.cmp 補全 popup、
+Cyberdream 配色、Web 開發完整 LSP。跨 Windows 工作站與 Linux VPS 同步使用
+（`git push` / `git pull`）。
 
 ## 特色
 
-- **雙補全並存**：blink.cmp 負責 popup（LSP 候選、Tailwind class），Codeium 負責行內 ghost
-  text 建議，`<Tab>` 讓給 Codeium，兩者視覺不衝突
+- **blink.cmp** 負責補全 popup（LSP 候選、Tailwind class）
 - **Cyberdream** 主題，前景覆寫為亮綠 `#00ff00`
 - **fzf-lua** 取代 Telescope、**snacks.explorer** 取代 neo-tree
 - 依 CPU 核數自動調整：vtsls 記憶體上限（≤4 核 1024MB／多核 4096MB）、lazy.nvim 安裝並發數
   （≤4 核降為 2），同一份設定同時適用 VPS 與工作站
-- **Windows 相容**：Codeium 路徑大小寫與 CRLF workaround、GCC/Clang 自動偵測
+- **Windows 相容**：GCC/Clang 自動偵測
 - **SSH session** 自動切換剪貼簿走 OSC 52，yank 自動鏡射回本機 `+` 暫存器
 
 ## 需求
@@ -21,6 +20,7 @@ Linux VPS 同步使用（`git push` / `git pull`）。
 - `git`、`gcc` 或 `clang`（Treesitter 編譯 parser）
 - `fzf`、`ripgrep`、`fd`（fzf-lua 搜尋）
 - `node` + `npm`（TS/Tailwind/Solidity LSP、markdown-preview、prettier）
+- `wl-clipboard`（Wayland）或 `xclip`（X11）：本機剪貼簿 provider，缺了 `y` 無法同步到系統剪貼簿
 
 Windows 上述工具可用 `winget` 安裝；Linux 系統層依賴完整清單見 [CLAUDE.md](./CLAUDE.md#linux-環境依賴)。
 
@@ -46,7 +46,7 @@ nvim
 
 | 分類 | Extra |
 | --- | --- |
-| AI | `ai.claudecode`、`ai.codeium` |
+| AI | `ai.claudecode` |
 | Editor | `editor.fzf` |
 | Formatting | `formatting.prettier` |
 | Lang | `lang.typescript`、`lang.tailwind`、`lang.json`、`lang.yaml`、`lang.markdown`、`lang.sql`、`lang.toml`、`lang.git`、`lang.solidity` |
@@ -58,8 +58,7 @@ nvim
 | 檔案 | 插件 | 重點 |
 | --- | --- | --- |
 | `colorschema.lua` | cyberdream.nvim | 主題設為 cyberdream，`lazy=false priority=1000`，前景覆寫亮綠 |
-| `blink.lua` | blink.cmp | 清空 `<Tab>`/`<S-Tab>` 讓給 Codeium；`<CR>` 已選則 accept 否則換行；候選不預選 |
-| `codeium.lua` | codeium.nvim | 純 ghost text（不接 cmp source）；含 Windows 路徑大小寫與 CRLF workaround |
+| `blink.lua` | blink.cmp | `<CR>` 已選則 accept 否則換行；候選不預選 |
 | `css.lua` | treesitter / cssls / tailwindcss / nvim-highlight-colors | Tailwind v4 `configFile` 指向 `app/globals.css`；`unknownAtRules` 設為忽略 |
 | `typescript.lua` | vtsls | `maxTsServerMemory` 依 CPU 核數切換 1024／4096 MB |
 | `snacks.lua` | snacks.explorer | 顯示隱藏檔；gitignore 命中仍隱藏；`.env*` 強制顯示 |
@@ -72,10 +71,6 @@ nvim
 | 按鍵 | 模式 | 作用 |
 | --- | --- | --- |
 | `jj` | insert | 離開 insert 模式 |
-| `<Tab>` | insert | Codeium：接受整段建議 |
-| `<M-w>` | insert | Codeium：接受一個單字 |
-| `<M-]>` / `<M-[>` | insert | Codeium：下一個 / 上一個建議 |
-| `<C-]>` | insert | Codeium：取消建議 |
 | `<CR>` | insert（補全中） | blink：已選候選則接受，否則換行 |
 | `<C-Space>` | insert | blink：手動觸發補全 / 顯示文件 |
 | `<leader>e` | normal | 開啟 snacks.explorer 檔案總管 |
@@ -119,7 +114,7 @@ lua/
     keymaps.lua       # 自訂快捷鍵（jj → <Esc>）
     autocmds.lua      # 停用 wrap_spell、關 vtsls semantic tokens
   plugins/
-    colorschema.lua、codeium.lua、blink.lua、css.lua、lint.lua、
+    colorschema.lua、blink.lua、css.lua、lint.lua、
     markdown.lua、typescript.lua、snacks.lua、fzf.lua
 ```
 

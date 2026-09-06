@@ -1,15 +1,11 @@
 -- blink.cmp：LSP / Tailwind 補全 popup
--- 設計：blink popup（LSP / Tailwind class）+ Codeium ghost text 並存
---   Tab 留給 Codeium ghost text 接受；blink popup 用 <CR> 或方向鍵操作
+-- Codeium 已隨 Windsurf → Devin 改名棄用（auth 流程失效），移除後補全單純交給 blink.cmp。
 return {
   {
     "saghen/blink.cmp",
     opts = {
       keymap = {
         preset = "default",
-        -- Tab 還給 Codeium ghost text；blink popup 透過 <CR> 或方向鍵操作
-        ["<Tab>"] = {},
-        ["<S-Tab>"] = {},
         -- <CR> 已選候選 → accept；沒選 → fallback 換行
         ["<CR>"] = { "accept", "fallback" },
         -- 手動觸發 popup（auto_show 預設已開，這條是保險）

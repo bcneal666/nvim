@@ -9,7 +9,7 @@ vim.g.omni_sql_no_default_maps = 1
 vim.opt.conceallevel = 0 -- 顯示完整 markdown 語法符號（不隱藏 ** / # 等）
 vim.opt.wrap = true -- 超出視窗寬度的程式碼自動換行顯示
 vim.opt.linebreak = true -- 換行點對齊單字邊界（不在單字中間斷行）
-vim.opt.fileformat = "unix" -- 存檔強制用 LF，避免 Codeium 生成碼混入 ^M
+vim.opt.fileformat = "unix" -- 存檔強制用 LF，避免跨機器（Windows/Linux）換行不一致
 
 -- 限制 ShaDa：原本累積到 335KB，啟動讀取 ~23ms、編輯期週期性寫入會微停頓。
 -- 100 檔歷史、每暫存器 50 行、單項上限 10KB、不存 hlsearch。
