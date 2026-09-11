@@ -12,7 +12,7 @@ Cyberdream 配色、Web 開發完整 LSP。跨 Windows 工作站與 Linux VPS �
 - 依 CPU 核數自動調整：vtsls 記憶體上限（≤4 核 1024MB／多核 4096MB）、lazy.nvim 安裝並發數
   （≤4 核降為 2），同一份設定同時適用 VPS 與工作站
 - **Windows 相容**：GCC/Clang 自動偵測
-- **SSH session** 自動切換剪貼簿走 OSC 52，yank 自動鏡射回本機 `+` 暫存器
+- **SSH session** 自動切換剪貼簿走 OSC 52，yank 自動鏡射回本機 `+` 暫存器；tmux 內另需設 `set-clipboard on`，細節見 [CLAUDE.md](./CLAUDE.md#剪貼簿本機-vs-ssh)
 
 ## 需求
 
