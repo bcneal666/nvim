@@ -61,7 +61,7 @@ nvim
 | `blink.lua` | blink.cmp | `<CR>` 已選則 accept 否則換行；候選不預選 |
 | `css.lua` | treesitter / cssls / tailwindcss / nvim-highlight-colors | Tailwind v4 `configFile` 指向 `app/globals.css`；`unknownAtRules` 設為忽略 |
 | `typescript.lua` | vtsls | `maxTsServerMemory` 依 CPU 核數切換 1024／4096 MB |
-| `snacks.lua` | snacks.explorer | 顯示隱藏檔；gitignore 命中仍隱藏；`.env*` 強制顯示 |
+| `snacks.lua` | snacks.explorer | 顯示隱藏檔；gitignore 命中（含 `.git`）也顯示；`.env*` 另用 include 強制顯示 |
 | `fzf.lua` | fzf-lua | files/grep 掃隱藏檔，排除 `.git`、`.jj` |
 | `lint.lua` | nvim-lint | 修正 markdownlint-cli2 的 `cwd`（Windows 路徑非 `~/.config/nvim`） |
 | `markdown.lua` | render-markdown.nvim | 停用（`enabled = false`） |

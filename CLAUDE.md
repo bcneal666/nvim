@@ -33,7 +33,7 @@ Repo 跨多機（Windows + Linux VPS）用 `git push` / `git pull` 同步。設�
 
 ### 剪貼簿（本機 vs SSH）
 
-`options.lua` 靠 `SSH_TTY` / `SSH_CONNECTION` 判斷是否 SSH session，僅遠端（如 VPS）設 `vim.g.clipboard` 走 OSC 52；本機不觸發，沿用 nvim 內建偵測（Wayland/X11 → `wl-copy` / `xclip`）。
+`options.lua` 靠 `SSH_TTY` / `SSH_CONNECTION` 判斷是否 SSH session，僅遠端（如 VPS）設 `vim.g.clipboard` 走 OSC 52；本機不觸發，沿用 nvim 內建偵測（Wayland/X11 走 `wl-copy` / `xclip`）。
 
 - **paste 只讀 nvim 自身 register**，不用 OSC 52 query：`vim.ui.clipboard.osc52` 的 paste 等終端機回應逾時最長 10 秒，多數終端機剪貼簿讀取又需逐次授權，代價太高
 - **yank 自動鏡射到 `+`**：`clipboard` 留空（不設 `unnamedplus`），改由 `TextYankPost` autocmd 只在 yank（非 `d`/`x`/`c`）且未指定 register 時寫進 `+`，觸發 OSC 52；`v` 選取後 `y` 即回本機，`"ay` 這類指定 register 的 yank 不鏡射
@@ -147,7 +147,7 @@ lua/
 
 ### 檔案總管
 
-`<leader>e` 開 **snacks.explorer**（LazyVim v8 起預設，非 neo-tree；本 repo 未裝後者）。過濾規則見 `lua/plugins/snacks.lua`：優先權 `include` glob > `hidden` > `ignored`；現況點檔全開、gitignore 命中仍隱藏、`.env*` 用 `include` 強制顯示。側欄 `H` / `I` 臨時切換 hidden / ignored。
+`<leader>e` 開 **snacks.explorer**（LazyVim v8 起預設，非 neo-tree；本 repo 未裝後者）。過濾規則見 `lua/plugins/snacks.lua`：優先權 `include` glob > `hidden` > `ignored`；現況點檔、gitignore 命中（含 `.git`，snacks 內部標為 ignored）全部顯示，`.env*` 額外用 `include` 強制顯示防未來調整。側欄 `H` / `I` 臨時切換 hidden / ignored。
 
 ### 補全策略
 
@@ -158,7 +158,7 @@ lua/
 - `<Tab>` — snippet 待跳轉時跳下一個欄位，否則正常縮排
 - 打關鍵字時 popup 自動彈出
 
-> 原並存 Codeium ghost text 已移除：Codeium 隨 Windsurf → Devin 改名棄用，`:Codeium Auth` 登入流程已失效。
+> 原並存 Codeium ghost text 已移除：Codeium 隨 Windsurf 改名 Devin 而棄用，`:Codeium Auth` 登入流程已失效。
 
 ### Windows 相容性
 
