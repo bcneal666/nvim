@@ -2,14 +2,15 @@
 
 ## 概覽
 
-**LazyVim** starter 底 Neovim 設定（Lazy.nvim 管 ~44 插件）。特色：**blink.cmp** 補全 popup、**Cyberdream** 配色、Web LSP 全套。
+**LazyVim** starter 底 Neovim 設定（Lazy.nvim 管 42 插件）。特色：**blink.cmp** 補全 popup、**Cyberdream** 配色、Web LSP 全套。
 
 ## 常用指令
 
 | 指令 | 用途 |
 | --- | --- |
 | `:Lazy` | 插件管理 UI |
-| `:Lazy sync` | 同步至 lock 版本 |
+| `:Lazy sync` | 安裝 + 清理 + 更新（會改寫 lazy-lock.json） |
+| `:Lazy restore` | 還原至 lazy-lock.json 版本 |
 | `:Lazy update` | 更新插件並寫入 lazy-lock.json |
 | `:Mason` | 管理 LSP / linter / formatter |
 | `:LazyExtras` | 管理 extras（寫入 lazyvim.json） |
@@ -25,8 +26,8 @@ Repo 跨多機（Windows + Linux VPS）用 `git push` / `git pull` 同步。設�
 
 | 項目 | 是否隨 repo 走 | 說明 |
 | --- | --- | --- |
-| `.gitattributes`（換行鎖 LF） | ✅ 版控內 | clone 即生效，免重設 |
-| `merge.autoStash` / `rebase.autoStash` | ❌ 不在版控 | 存 `~/.gitconfig`，**每台機器手動設一次** |
+| `.gitattributes`（換行鎖 LF） | 是（版控內） | clone 即生效，免重設 |
+| `merge.autoStash` / `rebase.autoStash` | 否（不在版控） | 存 `~/.gitconfig`，**每台機器手動設一次** |
 
 - **`lazy-lock.json` 自動寫入檔**：`:Lazy update` 直接改寫。裝完插件盡快 commit + push。兩機各 commit 同行不同版本＝真 merge conflict，autoStash 救不了，只能手動挑版本（通常取較新那次更新）。
 - **換行統一為 LF**：`.gitattributes` 對全部追蹤檔設 `eol=lf`，避免 Windows（系統層 `core.autocrlf=true`）與 Linux 間出現整檔換行假 diff。勿改 `core.autocrlf`，`.gitattributes` 的 `eol` 優先權高於它。
@@ -151,14 +152,12 @@ lua/
 
 ### 補全策略
 
-單純 **blink.cmp** popup（LSP 候選 / Tailwind class），無行內 ghost text：
+單純 **blink.cmp** popup（LSP 候選 / Tailwind class），無行內 ghost text（Codeium 已棄用，登入流程失效）：
 
 - `<CR>` — 已選則接受、未選 fallback 換行
 - `<C-Space>` — 手動觸發補全
 - `<Tab>` — snippet 待跳轉時跳下一個欄位，否則正常縮排
 - 打關鍵字時 popup 自動彈出
-
-> 原並存 Codeium ghost text 已移除：Codeium 隨 Windsurf 改名 Devin 而棄用，`:Codeium Auth` 登入流程已失效。
 
 ### Windows 相容性
 

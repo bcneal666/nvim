@@ -16,11 +16,17 @@ vim.opt.rtp:prepend(lazypath)
 
 -- 並發數依 CPU 核數自動調整：
 --   少核（VPS 2 核）壓到 2，避免 git/網路/記憶體爭搶。
---   多核（Windows 工作站）設 nil，交還 lazy.nvim 預設（Windows 下為 nproc*2）→ install/update/sync 全速。
+--   多核 Windows 工作站設 nil，交還 lazy.nvim 預設（nproc*2）→ install/update/sync 全速。
+--   多核 Linux 壓到 8：預設在 Linux 不設上限，數十個 git clone 同時寫檔會塞爆
+--   ClamAV on-access 掃描（OnAccessPrevention），拖過 git timeout 導致 install failed。
 local nproc = (vim.uv or vim.loop).available_parallelism and (vim.uv or vim.loop).available_parallelism() or 8
+local multicore_concurrency = 8
+if vim.fn.has("win32") == 1 then
+  multicore_concurrency = nil
+end
 
 require("lazy").setup({
-  concurrency = nproc <= 4 and 2 or nil,
+  concurrency = nproc <= 4 and 2 or multicore_concurrency,
   git = {
     timeout = 240, -- 預設 120s，VPS 網速慢時易誤判卡死（此為上限非延遲，多核快網機無害）
   },

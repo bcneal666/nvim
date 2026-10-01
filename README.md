@@ -10,7 +10,7 @@ Cyberdream 配色、Web 開發完整 LSP。跨 Windows 工作站與 Linux VPS �
 - **Cyberdream** 主題，前景覆寫為亮綠 `#00ff00`
 - **fzf-lua** 取代 Telescope、**snacks.explorer** 取代 neo-tree
 - 依 CPU 核數自動調整：vtsls 記憶體上限（≤4 核 1024MB／多核 4096MB）、lazy.nvim 安裝並發數
-  （≤4 核降為 2），同一份設定同時適用 VPS 與工作站
+  （≤4 核降為 2；多核 Linux 上限 8，Windows 沿用 lazy.nvim 預設），同一份設定同時適用 VPS 與工作站
 - **Windows 相容**：GCC/Clang 自動偵測
 - **SSH session** 自動切換剪貼簿走 OSC 52，yank 自動鏡射回本機 `+` 暫存器；tmux 內另需設 `set-clipboard on`，細節見 [CLAUDE.md](./CLAUDE.md#剪貼簿本機-vs-ssh)
 
@@ -83,7 +83,8 @@ nvim
 | 指令 | 用途 |
 | --- | --- |
 | `:Lazy` | 插件管理 UI |
-| `:Lazy sync` | 同步至 lock 版本 |
+| `:Lazy sync` | 安裝 + 清理 + 更新（會改寫 `lazy-lock.json`） |
+| `:Lazy restore` | 還原至 `lazy-lock.json` 的版本 |
 | `:Lazy update` | 更新插件並寫入 `lazy-lock.json`（`checker` 已關閉，需手動執行） |
 | `:Mason` | 管理 LSP / linter / formatter |
 | `:LazyExtras` | 管理 extras（寫入 `lazyvim.json`） |
@@ -100,7 +101,7 @@ nvim
 ```text
 init.lua              # 入口點：require("config.lazy")
 lazyvim.json          # LazyVim extras 清單
-lazy-lock.json        # 插件版本鎖定（44 個）
+lazy-lock.json        # 插件版本鎖定（42 個）
 stylua.toml           # Lua formatter 設定
 .markdownlint.json    # markdownlint 設定
 .gitattributes        # 換行統一為 LF
