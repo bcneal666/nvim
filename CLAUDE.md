@@ -200,6 +200,18 @@ ln -sf $(which fdfind) ~/.local/bin/fd
 
 X11 環境（無 Wayland）改裝 `xclip` 取代 `wl-clipboard`。
 
+### 舊 glibc：tree-sitter-cli 要自行編譯
+
+nvim-treesitter `main` 靠 `tree-sitter build` 編 parser。PATH 無 `tree-sitter` 時 LazyVim 會用 Mason 裝官方預編譯檔，需 glibc ≥ 2.39。glibc 較舊的系統（RHEL/Alma/Rocky 8、Debian 11/12、Ubuntu ≤ 22.04）會噴 `GLIBC_2.xx not found`，parser 全數安裝失敗。`ldd --version` 可查版本。
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+cargo install tree-sitter-cli --locked        # 約 3–4 分鐘，連結本機 glibc
+rm -rf ~/.local/share/nvim/mason/packages/tree-sitter-cli ~/.local/share/nvim/mason/bin/tree-sitter
+```
+
+Mason `PATH = "prepend"`，壞掉的 Mason 版若不移除會蓋過 `~/.cargo/bin`。之後重開 nvim 或 `:TSUpdate`。npm 版 `tree-sitter-cli` 同樣下載預編譯檔，無效。
+
 ### Mason 自動裝（進 nvim 後無需手動）
 
 - **LSP**：lua_ls、vtsls、cssls、tailwindcss-language-server、yaml-language-server、taplo、jsonls、solidity-ls、marksman
