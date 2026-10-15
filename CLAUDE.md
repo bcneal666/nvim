@@ -1,44 +1,44 @@
 # CLAUDE.md
 
-## 概覽
+## Overview
 
-**LazyVim** starter 底 Neovim 設定（Lazy.nvim 管 42 插件）。特色：**blink.cmp** 補全 popup、**Cyberdream** 配色、Web LSP 全套。
+**LazyVim** starter-based Neovim config (Lazy.nvim manages plugins). Features: **blink.cmp** popup completion, **Cyberdream** theme, full Web LSP stack.
 
-## 常用指令
+## Commands
 
-| 指令 | 用途 |
+| Command | Purpose |
 | --- | --- |
-| `:Lazy` | 插件管理 UI |
-| `:Lazy sync` | 安裝 + 清理 + 更新（會改寫 lazy-lock.json） |
-| `:Lazy restore` | 還原至 lazy-lock.json 版本 |
-| `:Lazy update` | 更新插件並寫入 lazy-lock.json |
-| `:Mason` | 管理 LSP / linter / formatter |
-| `:LazyExtras` | 管理 extras（寫入 lazyvim.json） |
-| `:checkhealth` | 診斷環境 |
-| `:ConformInfo` | 查看目前 buffer 的 formatter |
+| `:Lazy` | Plugin manager UI |
+| `:Lazy sync` | Install + clean + update (rewrites lazy-lock.json) |
+| `:Lazy restore` | Restore lazy-lock.json versions |
+| `:Lazy update` | Update plugins, write lazy-lock.json |
+| `:Mason` | Manage LSP / linter / formatter |
+| `:LazyExtras` | Manage extras (writes lazyvim.json) |
+| `:checkhealth` | Diagnose environment |
+| `:ConformInfo` | Show current buffer's formatter |
 
-Lua 格式化：手動跑 `stylua lua/`，或存檔 conform.nvim 自動套（Mason 裝 `stylua`，與系統版共存）。設定見 `stylua.toml`（2 空格縮排、120 字元寬）。
-JS/TS/CSS/JSON/Markdown 交 prettier（`formatting.prettier` extra），僅專案有 prettier 設定檔（`.prettierrc` 等）才格式化（`vim.g.lazyvim_prettier_needs_config = true`，見 `options.lua`），避免污染無 prettier 專案。
+Lua format: run `stylua lua/` manually, or conform.nvim applies on save (Mason installs `stylua`; coexists with system one). Config: `stylua.toml` (2-space indent, 120 cols).
+JS/TS/CSS/JSON/Markdown → prettier (`formatting.prettier` extra). Format only when project has prettier config file (`.prettierrc` etc.) (`vim.g.lazyvim_prettier_needs_config = true`, see `options.lua`) — avoids polluting projects without prettier.
 
-## 跨機器同步
+## Cross-machine sync
 
-Repo 跨多機（Windows + Linux VPS）用 `git push` / `git pull` 同步。設定兩種，先分清：隨 repo 走、各機自設。
+Repo syncs across machines (Windows + Linux VPS) via `git push` / `git pull`. Two kinds of setup, keep distinct: travels with repo vs per-machine.
 
-| 項目 | 是否隨 repo 走 | 說明 |
+| Item | Travels with repo | Note |
 | --- | --- | --- |
-| `.gitattributes`（換行鎖 LF） | 是（版控內） | clone 即生效，免重設 |
-| `merge.autoStash` / `rebase.autoStash` | 否（不在版控） | 存 `~/.gitconfig`，**每台機器手動設一次** |
+| `.gitattributes` (LF line endings) | Yes (versioned) | Effective on clone, no setup |
+| `merge.autoStash` / `rebase.autoStash` | No (not versioned) | Lives in `~/.gitconfig`, **set once per machine manually** |
 
-- **`lazy-lock.json` 自動寫入檔**：`:Lazy update` 直接改寫。裝完插件盡快 commit + push。兩機各 commit 同行不同版本＝真 merge conflict，autoStash 救不了，只能手動挑版本（通常取較新那次更新）。
-- **換行統一為 LF**：`.gitattributes` 對全部追蹤檔設 `eol=lf`，避免 Windows（系統層 `core.autocrlf=true`）與 Linux 間出現整檔換行假 diff。勿改 `core.autocrlf`，`.gitattributes` 的 `eol` 優先權高於它。
+- **`lazy-lock.json` is auto-written**: `:Lazy update` rewrites it. Commit + push right after installing plugins. Two machines committing different versions on same line = real merge conflict; autoStash cannot fix; pick version manually (usually the newer update).
+- **Line endings unified to LF**: `.gitattributes` sets `eol=lf` on all tracked files, avoiding whole-file fake diffs between Windows (system `core.autocrlf=true`) and Linux. Never change `core.autocrlf`; `.gitattributes` `eol` outranks it.
 
-### 剪貼簿（本機 vs SSH）
+### Clipboard (local vs SSH)
 
-`options.lua` 靠 `SSH_TTY` / `SSH_CONNECTION` 判斷是否 SSH session，僅遠端（如 VPS）設 `vim.g.clipboard` 走 OSC 52；本機不觸發，沿用 nvim 內建偵測（Wayland/X11 走 `wl-copy` / `xclip`）。
+`options.lua` detects SSH session via `SSH_TTY` / `SSH_CONNECTION`; only remote (e.g. VPS) sets `vim.g.clipboard` to OSC 52. Local: not triggered, uses nvim built-in detection (Wayland/X11 via `wl-copy` / `xclip`).
 
-- **paste 只讀 nvim 自身 register**，不用 OSC 52 query：`vim.ui.clipboard.osc52` 的 paste 等終端機回應逾時最長 10 秒，多數終端機剪貼簿讀取又需逐次授權，代價太高
-- **yank 自動鏡射到 `+`**：`clipboard` 留空（不設 `unnamedplus`），改由 `TextYankPost` autocmd 只在 yank（非 `d`/`x`/`c`）且未指定 register 時寫進 `+`，觸發 OSC 52；`v` 選取後 `y` 即回本機，`"ay` 這類指定 register 的 yank 不鏡射
-- **VPS 跑 tmux**：`~/.tmux.conf` 加以下兩行（tmux 2.6+，不進版控，各機自設）：
+- **Paste reads only nvim's own register**, no OSC 52 query: `vim.ui.clipboard.osc52` paste waits up to 10 s for terminal response, and most terminals need per-read authorization — cost too high
+- **Yank auto-mirrors to `+`**: `clipboard` left empty (no `unnamedplus`); `TextYankPost` autocmd writes `+` (triggers OSC 52) only on yank (not `d`/`x`/`c`) with no register specified; `v` select then `y` lands on local machine; yank with explicit register like `"ay` not mirrored
+- **VPS running tmux**: add these two lines to `~/.tmux.conf` (tmux 2.6+, not versioned, per machine):
 
   ```tmux
   set -g set-clipboard on              # 預設值 external：tmux 自己能設剪貼簿，
@@ -47,26 +47,26 @@ Repo 跨多機（Windows + Linux VPS）用 `git push` / `git pull` 同步。設�
                                               # 這些非 xterm* 的 TERM 需額外宣告才會轉發
   ```
 
-  改完對現有 server 生效（改設定檔不會自動套用到已啟動的 server）：
+  Apply to running server (editing config file does not affect an already started server):
 
   ```bash
   tmux set -g set-clipboard on
   tmux set -ag terminal-features ',*:clipboard'
   ```
 
-  切勿用 `tmux kill-server` 讓設定生效，會砍光所有現存 session。
+  Never use `tmux kill-server` to apply — kills all existing sessions.
 
-- **本機終端機也要支援 OSC 52 寫入**，否則上面全部白做：ghostty／kitty／WezTerm／Alacritty／Windows Terminal（較新版）預設可用；GNOME Terminal／Tilix／Terminator（VTE 系列）多數版本不支援，終端機本身限制，遠端補不了。免裝 nvim 單行自測（tmux 內外各跑一次，切開是 tmux 還終端機的問題）：
+- **Local terminal must also support OSC 52 writes**, else all above is wasted: ghostty / kitty / WezTerm / Alacritty / Windows Terminal (recent) work by default; GNOME Terminal / Tilix / Terminator (VTE family) mostly unsupported — terminal limit, remote cannot fix. nvim-free one-line test (run inside and outside tmux; difference isolates tmux vs terminal):
 
   ```bash
   printf '\033]52;c;%s\a' "$(printf 'osc52-test' | base64)"
   ```
 
-  跑完本機貼上，貼出 `osc52-test` 才算通。終端機不支援時，替代方案：換支援的終端機（最省事）；或 tmux 內 Shift+滑鼠拖曳走終端機原生選取（連行號、signcolumn 一起選到，先關掉較乾淨）；或架 `lemonade` 之類雙向剪貼簿轉發服務（複雜度高一階，連 paste 方向也一起解決）。
+  Paste locally after running; seeing `osc52-test` = pass. Terminal unsupported → alternatives: switch to supporting terminal (easiest); or Shift+mouse-drag inside tmux for terminal-native selection (also selects line numbers, signcolumn — disable them first); or run bidirectional clipboard relay like `lemonade` (one step more complex; also solves paste direction).
 
-### 每台新機器的一次性設定（必做）
+### One-time setup per new machine (required)
 
-git config 不在版控，clone 後需自設：
+git config not versioned; set after clone:
 
 ```bash
 # 1. 先確認 git 版本 ≥ 2.27（merge.autoStash 的最低要求）
@@ -81,18 +81,18 @@ git config --global --get merge.autoStash
 git config --global --get rebase.autoStash
 ```
 
-寫入位置：Linux `~/.gitconfig`，Windows `C:/Users/<使用者>/.gitconfig`。
-只影響此 repo：`--global` 換 `--local`（需在 repo 目錄內執行）。
+Write location: Linux `~/.gitconfig`, Windows `C:/Users/<username>/.gitconfig`.
+Affect this repo only: swap `--global` for `--local` (run inside repo dir).
 
-git < 2.27（舊版 Debian/Ubuntu 可能遇到）：`merge.autoStash` 無效，改用 rebase 模式達等效行為：
+git < 2.27 (old Debian/Ubuntu): `merge.autoStash` has no effect; use rebase mode for equivalent behavior:
 
 ```bash
 git config --global pull.rebase true    # 搭配 rebase.autoStash（1.8.4+ 即支援）
 ```
 
-### 既有 checkout 的換行刷新（每台機器僅一次）
+### Line-ending refresh for existing checkouts (once per machine)
 
-`.gitattributes` 加入後，舊工作區已 checkout 的 CRLF 檔不會自動轉換：
+After `.gitattributes` was added, CRLF files already checked out are not auto-converted:
 
 ```bash
 git status                              # 必須先確認乾淨，下一行會丟棄未提交變更
@@ -100,9 +100,9 @@ git rm --cached -r . && git reset --hard
 git ls-files --eol                      # 每列應為 i/lf w/lf attr/text=auto eol=lf
 ```
 
-Linux 本來就 LF，這步主要影響 Windows 機器；新 clone 機器不用跑。
+Linux already LF; step mainly affects Windows machines; fresh clones skip.
 
-## 目錄結構
+## Directory structure
 
 ```text
 init.lua              # 入口點：require("config.lazy")
@@ -131,66 +131,80 @@ lua/
     fzf.lua           # fzf-lua grep 掃隱藏檔
 ```
 
-## 核心架構
+## Core architecture
 
-### 載入流程
+### Load flow
 
-`init.lua` → `config/lazy.lua` → LazyVim 預設插件 → `lua/plugins/*.lua`
+`init.lua` → `config/lazy.lua` → LazyVim default plugins → `lua/plugins/*.lua`
 
-### 已啟用 LazyVim Extras（lazyvim.json）
+### Enabled LazyVim extras (lazyvim.json)
 
-- **AI**：`ai.claudecode`
-- **Editor**：`editor.fzf`（fzf-lua，取代 Telescope）
-- **語言**：`lang.typescript`、`lang.tailwind`、`lang.json`、`lang.yaml`、`lang.markdown`、`lang.sql`、`lang.toml`、`lang.git`、`lang.solidity`
-- **Formatting**：`formatting.prettier`
+- **AI**: `ai.claudecode`
+- **Editor**: `editor.fzf` (fzf-lua, replaces Telescope)
+- **Languages**: `lang.typescript`, `lang.tailwind`, `lang.json`, `lang.yaml`, `lang.markdown`, `lang.sql`, `lang.toml`, `lang.git`, `lang.solidity`
+- **Formatting**: `formatting.prettier`
 
-新增語言支援：優先 `:LazyExtras`，勿手動設 LSP。
+Add language support via `:LazyExtras` first (extras wire all three LSP layers); hand-write LSP config only when no extra fits, see LSP setup.
 
-### 檔案總管
+### File explorer
 
-`<leader>e` 開 **snacks.explorer**（LazyVim v8 起預設，非 neo-tree；本 repo 未裝後者）。過濾規則見 `lua/plugins/snacks.lua`：優先權 `include` glob > `hidden` > `ignored`；現況點檔、gitignore 命中（含 `.git`，snacks 內部標為 ignored）全部顯示，`.env*` 額外用 `include` 強制顯示防未來調整。側欄 `H` / `I` 臨時切換 hidden / ignored。
+`<leader>e` opens **snacks.explorer** (LazyVim v8+ default, not neo-tree; neo-tree not installed). Filter rules in `lua/plugins/snacks.lua`: precedence `include` glob > `hidden` > `ignored`; currently dotfiles and gitignore hits (incl. `.git`, which snacks internally marks ignored) all shown; `.env*` additionally forced via `include` against future changes. Sidebar `H` / `I` temporarily toggle hidden / ignored.
 
-### 補全策略
+### Completion
 
-單純 **blink.cmp** popup（LSP 候選 / Tailwind class），無行內 ghost text（Codeium 已棄用，登入流程失效）：
+**blink.cmp** popup only (LSP candidates / Tailwind class); no inline ghost text:
 
-- `<CR>` — 已選則接受、未選 fallback 換行
-- `<C-Space>` — 手動觸發補全
-- `<Tab>` — snippet 待跳轉時跳下一個欄位，否則正常縮排
-- 打關鍵字時 popup 自動彈出
+- `<CR>` — accept if selected, else fall back to newline
+- `<C-Space>` — trigger completion manually
+- `<Tab>` — jump to next field when snippet pending, else normal indent
+- Popup opens automatically while typing keywords
 
-### Windows 相容性
+### Windows compatibility
 
-`options.lua` 自動偵測 GCC / Clang 當 C 編譯器（Treesitter 用）。
+`options.lua` auto-detects GCC / Clang as C compiler (for Treesitter).
 
-## 插件慣例
+## Plugin conventions
 
-1. 每功能建獨立檔案於 `lua/plugins/`，回傳 Lazy.nvim spec table
-2. 覆寫 LazyVim 預設插件：**只指定要改欄位**（Lazy.nvim 會合併）
-3. 停用插件：`enabled = false` 或 `return {}`
+1. One file per feature in `lua/plugins/`, returning Lazy.nvim spec table
+2. Overriding LazyVim default plugin: **specify only changed fields** (Lazy.nvim merges)
+3. Disable plugin: `enabled = false` or `return {}`
 
-## LSP 設定
+## LSP setup
 
-三層架構：**Mason**（安裝）→ **mason-lspconfig**（橋接）→ **nvim-lspconfig**（設定）
+Three layers: **Mason** (install) → **mason-lspconfig** (bridge) → **nvim-lspconfig** (config)
 
-參考模式：`lua/plugins/css.lua`（同時設定三層）
+Reference pattern: `lua/plugins/css.lua` (configures all three layers)
 
-## Linux 環境依賴
+## Linux dependencies
 
-Clone 後先裝系統層工具（Mason 不管這層）。
+After clone, install system-level tools first (Mason does not manage this layer).
 
-### 必裝
+### Neovim itself: no apt
 
-| 工具 | 套件名（Ubuntu/Debian） | 需要它的功能 |
+LazyVim `main` needs nvim ≥ 0.11.2. Ubuntu LTS apt `neovim` is frozen at release-time version (24.04: 0.9.5), never gets major upgrades; LazyVim errors immediately on it. Install official prebuilt tarball instead (x86_64; needs new-enough glibc; rerun same block to update):
+
+```bash
+sudo apt remove neovim neovim-runtime
+curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+sudo rm -rf /opt/nvim-linux-x86_64
+sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
+sudo ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/local/bin/nvim
+rm nvim-linux-x86_64.tar.gz
+nvim --version | head -1                 # 應 ≥ 0.11.2
+```
+
+### Required
+
+| Tool | Package (Ubuntu/Debian) | Needed by |
 | --- | --- | --- |
-| `git` | `git` | lazy.nvim bootstrap、gitsigns |
-| `gcc` / `clang` | `gcc` | nvim-treesitter 編譯 parser |
-| `fzf` | `fzf` | editor.fzf（fzf-lua） |
-| `ripgrep` | `ripgrep` | fzf 搜尋、grug-far |
-| `fd` | `fd-find` | fzf 檔案搜尋 |
-| `node` + `npm` | `nodejs npm` | TS/Tailwind/Solidity LSP、markdown-preview、prettier |
-| `python3` + `pip` | `python3 python3-pip` | 僅在啟用 `lang.python` extra 時需要（目前未啟用） |
-| `wl-copy` / `wl-paste` | `wl-clipboard`（Wayland）或 `xclip`（X11） | 本機 `unnamedplus` 剪貼簿同步，缺了 `y` 貼不到系統剪貼簿。**純 SSH 無 GUI VPS 不用裝**，OSC 52 走終端機跳脫序列，不經本機 X11/Wayland provider |
+| `git` | `git` | lazy.nvim bootstrap, gitsigns |
+| `gcc` / `clang` | `gcc` | nvim-treesitter parser compile |
+| `fzf` | `fzf` | editor.fzf (fzf-lua) |
+| `ripgrep` | `ripgrep` | fzf search, grug-far |
+| `fd` | `fd-find` | fzf file search |
+| `node` + `npm` | `nodejs npm` | TS/Tailwind/Solidity LSP, markdown-preview, prettier |
+| `python3` + `pip` | `python3 python3-pip` | Only if `lang.python` extra enabled (currently not) |
+| `wl-copy` / `wl-paste` | `wl-clipboard` (Wayland) or `xclip` (X11) | Local `unnamedplus` clipboard sync; missing → `y` cannot reach system clipboard. **Pure-SSH VPS without GUI: skip** — OSC 52 uses terminal escape sequences, bypasses local X11/Wayland provider |
 
 ```bash
 sudo apt install git gcc fzf ripgrep fd-find nodejs npm python3 python3-pip wl-clipboard
@@ -198,11 +212,11 @@ sudo apt install git gcc fzf ripgrep fd-find nodejs npm python3 python3-pip wl-c
 ln -sf $(which fdfind) ~/.local/bin/fd
 ```
 
-X11 環境（無 Wayland）改裝 `xclip` 取代 `wl-clipboard`。
+X11 (no Wayland): install `xclip` instead of `wl-clipboard`.
 
-### 舊 glibc：tree-sitter-cli 要自行編譯
+### Old glibc: build tree-sitter-cli yourself
 
-nvim-treesitter `main` 靠 `tree-sitter build` 編 parser。PATH 無 `tree-sitter` 時 LazyVim 會用 Mason 裝官方預編譯檔，需 glibc ≥ 2.39。glibc 較舊的系統（RHEL/Alma/Rocky 8、Debian 11/12、Ubuntu ≤ 22.04）會噴 `GLIBC_2.xx not found`，parser 全數安裝失敗。`ldd --version` 可查版本。
+nvim-treesitter `main` compiles parsers via `tree-sitter build`. With no `tree-sitter` on PATH, LazyVim installs official prebuilt binary via Mason, needing glibc ≥ 2.39. Older systems (RHEL/Alma/Rocky 8, Debian 11/12, Ubuntu ≤ 22.04) hit `GLIBC_2.xx not found`; all parser installs fail. Check version: `ldd --version`.
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
@@ -210,17 +224,18 @@ cargo install tree-sitter-cli --locked        # 約 3–4 分鐘，連結本機 
 rm -rf ~/.local/share/nvim/mason/packages/tree-sitter-cli ~/.local/share/nvim/mason/bin/tree-sitter
 ```
 
-Mason `PATH = "prepend"`，壞掉的 Mason 版若不移除會蓋過 `~/.cargo/bin`。之後重開 nvim 或 `:TSUpdate`。npm 版 `tree-sitter-cli` 同樣下載預編譯檔，無效。
+Mason `PATH = "prepend"`: broken Mason copy not removed shadows `~/.cargo/bin`. Then restart nvim or `:TSUpdate`. npm `tree-sitter-cli` also downloads prebuilt binary, useless here.
 
-### Mason 自動裝（進 nvim 後無需手動）
+### Mason auto-installs (no manual step after entering nvim)
 
-- **LSP**：lua_ls、vtsls、cssls、tailwindcss-language-server、yaml-language-server、taplo、jsonls、solidity-ls、marksman
-- **Formatter**：prettier、stylua、shfmt、markdown-toc
-- **Linter**：markdownlint-cli2、sqlfluff
+- **LSP**: lua_ls, vtsls, cssls, tailwindcss-language-server, yaml-language-server, taplo, jsonls, solidity-ls, marksman
+- **Formatter**: prettier, stylua, shfmt, markdown-toc
+- **Linter**: markdownlint-cli2, sqlfluff
 
-### 選裝
+### Optional
 
-| 工具 | 用途 |
+| Tool | Purpose |
 | --- | --- |
 | `psql` / `mysql` / `sqlite3` | lang.sql + vim-dadbod |
-| `solc` | lang.solidity 編譯合約 |
+| `solc` | lang.solidity contract compile |
+| `lazygit` | `<leader>gg` Git UI. Not in apt; fetch `lazygit_<ver>_Linux_x86_64.tar.gz` from [GitHub release](https://github.com/jesseduffield/lazygit/releases), extract `lazygit`, then `sudo install lazygit /usr/local/bin/` |
