@@ -56,13 +56,16 @@ Repo syncs across machines (Windows + Linux VPS) via `git push` / `git pull`. Tw
 
   Never use `tmux kill-server` to apply — kills all existing sessions.
 
-- **Local terminal must also support OSC 52 writes**, else all above is wasted: ghostty / kitty / WezTerm / Alacritty / Windows Terminal (recent) work by default; GNOME Terminal / Tilix / Terminator (VTE family) mostly unsupported — terminal limit, remote cannot fix. nvim-free one-line test (run inside and outside tmux; difference isolates tmux vs terminal):
+- **Local terminal must also support OSC 52 writes**, else none of above works: ghostty / kitty / WezTerm / Alacritty / Windows Terminal (recent) work by default; GNOME Terminal / Tilix / Terminator (VTE family) mostly unsupported — terminal limit, remote cannot fix. nvim-free one-line test (run inside and outside tmux; difference isolates tmux vs terminal):
 
   ```bash
   printf '\033]52;c;%s\a' "$(printf 'osc52-test' | base64)"
   ```
 
-  Paste locally after running; seeing `osc52-test` = pass. Terminal unsupported → alternatives: switch to supporting terminal (easiest); or Shift+mouse-drag inside tmux for terminal-native selection (also selects line numbers, signcolumn — disable them first); or run bidirectional clipboard relay like `lemonade` (one step more complex; also solves paste direction).
+  Paste locally after running; seeing `osc52-test` = pass. Terminal unsupported → alternatives:
+  - switch to supporting terminal (easiest)
+  - Shift+mouse-drag inside tmux for terminal-native selection (also selects line numbers, signcolumn — disable them first)
+  - run bidirectional clipboard relay like `lemonade` (one step more complex; also solves paste direction)
 
 ### One-time setup per new machine (required)
 
@@ -113,17 +116,25 @@ stylua.toml           # Lua formatter 設定
 .gitattributes        # 換行鎖 LF（eol=lf）
 .gitignore            # 忽略暫存/除錯檔案
 .neoconf.json         # neoconf/neodev：讓 lua_ls 認得 nvim API
+README.md             # 對外說明（安裝、設定、鍵位）
+LICENSE               # Apache 2.0
+skills-lock.json      # skills 來源與雜湊鎖定
+
+.claude/
+  settings.json       # Claude Code 專案設定（權限、SessionStart hook）
+  skills/             # neovim、lazy-nvim-optimization（專案專用 skill）
+.agents/skills/       # 同批 skill 的安裝器副本（含 caveman）
 
 lua/
   config/
     lazy.lua          # bootstrap + 全域設定（並發依核數、checker 關）
-    options.lua       # vim.opt 覆寫（wrap、shada 上限、Windows 編譯器偵測、Linux OOM）
+    options.lua       # vim.opt 覆寫（wrap、shada 上限、Windows 編譯器偵測、Linux OOM、prettier 需設定檔、停用 sql omni 鍵位、SSH OSC 52 剪貼簿）
     keymaps.lua       # 自訂快捷鍵（jj → <Esc>，離開 insert 模式）
     autocmds.lua      # 自訂 autocmd（停用 wrap_spell、關 vtsls semantic tokens）
   plugins/
     colorschema.lua   # Cyberdream 主題（lazy:false, priority:1000）
     blink.lua         # blink.cmp 鍵位與 popup 行為
-    css.lua           # CSS/SCSS：Treesitter + cssls + highlight-colors
+    css.lua           # CSS/SCSS：Treesitter + cssls + tailwindcss（v4 configFile → app/globals.css）+ highlight-colors
     lint.lua          # markdownlint-cli2 工作目錄設定
     markdown.lua      # 停用 render-markdown
     typescript.lua    # vtsls 設定（maxTsServerMemory 依機器）
@@ -173,7 +184,7 @@ Add language support via `:LazyExtras` first (extras wire all three LSP layers);
 
 Three layers: **Mason** (install) → **mason-lspconfig** (bridge) → **nvim-lspconfig** (config)
 
-Reference pattern: `lua/plugins/css.lua` (configures all three layers)
+Reference pattern: `lua/plugins/css.lua` configures Mason (`ensure_installed`) + nvim-lspconfig (`servers`). mason-lspconfig bridge needs no spec: LazyVim sets it up and auto-enables installed servers (`automatic_enable`).
 
 ## Linux dependencies
 
